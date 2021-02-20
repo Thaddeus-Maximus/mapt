@@ -5,7 +5,7 @@ Inspired by a nifty directory tool I've used, but intended to be better, and ope
 # Real objects
 - A `pin` has a `type`, `name`, `picture`(s?), `description`, and `coordinates` in its associated `area`. The pin can be a special type, which is an `area`.
 - An `area` has within it more `pin`s and the `picture` is used to show a layout of the area.
-- `type` is used to categorize `pin`s; e.g. a type could be a Person (their desk), a Printer, a Tool, a Cabinet...
+- `type` is used to categorize `pin`s; e.g. a type could be a Person (their desk), a Printer, a Tool, a Cabinet... types have `color` (maybe bubble style?) and `fields`.
  
 - I don't know if areas are pins, or pins _point to_ areas... I think the former is actually easier. There's plenty of cases in which we want both, some cases in which we want just areas, and no cases in which we want just non-areas. And their behaviors are the same.
 
@@ -23,7 +23,13 @@ Inspired by a nifty directory tool I've used, but intended to be better, and ope
 - Search pins by content (eventually)
 - "Enter" an area
 - "Leave" an area (back up a recursion)
+- CRUD types
+  - This could have nasty propogations onto pins
 - CRUD areas
   - Note that changing the picture/layout of an area should prompt something to be done about the pins
 - CRUD pins
   - Placing the pin on the appropriate area will require some UX thought
+
+# Delightful things we could do
+- Directory TV in lobby
+- Report problems
