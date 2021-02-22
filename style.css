@@ -1,0 +1,35 @@
+
+
+#navPane {
+	width: 330px;
+	margin-left: 5px;
+}
+#detailPane {
+	width: 330px;
+	margin-left: 355px;
+}
+#mapPane {
+	width: 700px;
+	margin-left: 705px;
+}
+
+.pane {
+	height: 100%;
+	padding-top:    5px;
+	padding-left:   5px;
+	padding-right:  5px;
+	padding-bottom: 5px;
+	position: fixed;
+	border: 1px solid black;
+}
+
+.typeheader {
+	font-size: 16pt;
+	font-weight: bold;
+}
+
+ul {
+	list-style-type: none;
+	padding-left: 3px;
+	background: #ddd;
+}
