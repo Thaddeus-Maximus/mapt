@@ -8,10 +8,10 @@ window.onload = function() {
 }
 
 function runFindPins() {
-  keyword = document.getElementById("searchBox").value
+  let keyword = document.getElementById("searchBox").value
   console.log("Searching for", keyword)
-  findPins(keyword).then((x) => {
+  findPins(keyword).then((foundPins) => {
   	// actually do something with the pins...
-  	console.log("Found these pins:", x)
+  	console.log("Found these pins:", foundPins)
   })
 }
