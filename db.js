@@ -15,13 +15,14 @@ var db = firebase.firestore();
 
 // Functions to work with the database
 
-/* type
+/* Schema reference
+ *
+ * types
  * - name   (string)
  * - color  (string [#xxxxxx])
  * - fields (string [list,of,fields])
- */
-
-/* pin
+ *
+ * pins
  * - type          (id)
  * - name          (string)
  * - searchdata    (string, lowercase of name)
