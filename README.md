@@ -1,5 +1,6 @@
 # mapt
-Organize resources by where they are.
+Organize resources by where they are. Navigate a space and find pins with details. Sort by category, search by name and details. Useful for finding the resources related to a tool, where something might be, who's got what rental plot, and even a bit of a 'virtual tour' if done slickly enough.
+
 Inspired by a nifty directory tool I've used, but intended to be better, and opensource.
 
 # Real objects
