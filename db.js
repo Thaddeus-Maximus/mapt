@@ -87,13 +87,29 @@ async function sendPin(data) {
 async function getPin(pinId) {
   // Find pin #pinId and then call f(data)
   let doc = await db.collection("pins").doc(pinId).get();
-  let x = null;
+  let pin = null;
 
   if (doc.exists) {
-    let x = {...doc.data(), id: doc.id}
+    return {...doc.data(), id: doc.id}
+  } else {
+    console.log("Pin does not exist.")
+    return null
   }
-  return x
 }
+
+async function getType(typeId) {
+  // Find type #typeId
+  let doc = await db.collection("types").doc(typeId).get();
+  let type = null;
+
+  if (doc.exists) {
+    return {...doc.data(), id: doc.id}
+  } else {
+    console.log("Type does not exist.")
+    return null
+  }
+}
+
 
 async function getChildPins(pinId) {
   // Find pins whose immediate parent is pin #pinId and then call f(data)
@@ -117,7 +133,7 @@ async function getRootPin() {
 
 async function findPinsByType(text) {
   // Find pins which match <text> and then call f(data)
-  let dbQueryResult = await db.collection("pins").where("parent", "==", null).get();
+  let dbQueryResult = await db.collection("pins").get();
   let typeMap = {};
   dbQueryResult.forEach((doc) => {
     console.log(doc)

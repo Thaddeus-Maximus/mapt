@@ -9,8 +9,6 @@
 
 <body>
   <div id="navPane" class="pane">
-    <h3>NavPane</h3>
-
     <input id="searchBox">
     <button id="searchButton">>></button>
     <ul id="searchResults">
@@ -19,10 +17,18 @@
     </ul>
   </div>
   <div id="detailPane" class="pane">
-    <h3>DetailPane</h3>
+    <h3 id="detailTitle">DetailPane</h3>
+    <button id="detailEdit">Edit</button>
+    <img id="detailImage" width="100%"/>
+    <table id="detailTable" class="kvTable">
+      <tr class="detailRow">
+        <td class="detailLabel">Label</td>
+        <td class="detailContent">Content</td>
+      </tr>
+    </table>
   </div>
   <div id="mapPane" class="pane">
-    <h3>MapPane</h3>
+    <div id="mapImage"></div>
   </div>
 </body>
 

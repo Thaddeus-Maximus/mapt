@@ -28,12 +28,31 @@
 	font-weight: bold;
 }
 
-.pinListing {
+a {
 	text-decoration: underline;
+}
+a:hover {
+	color: #008;
+	cursor: pointer;
 }
 
 ul {
 	list-style-type: none;
 	padding-left: 3px;
 	background: #ddd;
+}
+
+
+.kvTable {
+	width: 100%;
+}
+.kvTable td:nth-child(1) {
+	font-weight: bold;
+}
+
+.kvTable tr:nth-child(even) {
+	background-color: #ccc;
+}
+.kvTable tr:nth-child(odd) {
+	background-color: #eee;
 }
