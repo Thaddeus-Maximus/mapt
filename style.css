@@ -23,9 +23,13 @@
 	border: 1px solid black;
 }
 
-.typeheader {
-	font-size: 16pt;
+.typeListing {
+	font-size: 20pt;
 	font-weight: bold;
+}
+
+.pinListing {
+	text-decoration: underline;
 }
 
 ul {

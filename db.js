@@ -32,10 +32,15 @@ let db = firebase.firestore();
  * - coords        (list of tuples of x-y points... a point if one tuple, a polygon if more than one (lines are polygons right?))
  */
 
-// This should be done once during setup, no more.
 async function getTypes() {
   let dbQueryResult = await db.collection("types").get();
-  return dbQueryResult.map((doc) => {return doc.data()});
+  let typeMap = {}
+  dbQueryResult.forEach((doc) => {
+    if (! doc.id in typeMap)
+      typeMap[doc.id] = []
+    typeMap[doc.id] = {...doc.data(), id: doc.id}
+  });
+  return typeMap;
 }
 
 async function sendType(data) {
@@ -85,7 +90,7 @@ async function getPin(pinId) {
   let x = null;
 
   if (doc.exists) {
-    let x = doc.data();
+    let x = {...doc.data(), id: doc.id}
   }
   return x
 }
@@ -102,7 +107,7 @@ async function getRootPin() {
   let x = null;
   dbQueryResult.forEach((doc) => {
     if (x === null)
-      x = doc.data();
+      x = {...doc.data(), id: doc.id}
     else
       alert("There's more than one 'root' pin. I'm picking the first, but report this to the admin."); // TODO: Remove this
   })
@@ -110,7 +115,17 @@ async function getRootPin() {
   return x;
 }
 
-async function findPins(text) {
+async function findPinsByType(text) {
   // Find pins which match <text> and then call f(data)
-  return null;
+  let dbQueryResult = await db.collection("pins").where("parent", "==", null).get();
+  let typeMap = {};
+  dbQueryResult.forEach((doc) => {
+    console.log(doc)
+    pin = {...doc.data(), id: doc.id}
+    if (! (pin.type in typeMap))
+      typeMap[pin.type] = []
+    typeMap[pin.type].push(pin)
+  })
+
+  return typeMap;
 }
