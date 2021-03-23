@@ -1,24 +1,28 @@
 
 <head>
   <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-firestore.js"></script>
   <script src="db.js"></script>
   <script src="ui.js"></script>
+  <script src="marked.min.js"></script>
 </head>
 
 <body>
   <div id="navPane" class="pane">
     <input id="searchBox">
     <button id="searchButton">>></button>
+    <button id="newPin">New [+]</button>
     <ul id="searchResults">
       <li class="typeheader">Sample Type Header</li>
       <li><a href="#">Sample Pin</a></li>
     </ul>
   </div>
   <div id="detailPane" class="pane">
-    <h3 id="detailTitle">DetailPane</h3>
-    <button id="detailEdit">Edit</button>
+    <div id="detailTitle">DetailPane</div>
+    <button id="detailEdit" style="display:none">Edit</button>
+    <button id="detailSave" style="display:none">Save</button>
     <img id="detailImage" width="100%"/>
     <table id="detailTable" class="kvTable">
       <tr class="detailRow">

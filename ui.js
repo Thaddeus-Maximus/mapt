@@ -5,14 +5,16 @@ window.onload = function() {
 	    }
 	});
   document.getElementById("searchButton").addEventListener("click", runFindPins);
-  runFindPins()
   document.getElementById("detailEdit").addEventListener("click", editActiveDetail);
+  document.getElementById("detailSave").addEventListener("click", saveActiveDetail);
+  document.getElementById("newPin").addEventListener("click", makeNewPin);
+  runFindPins();
 }
 
 function loadSvgToMap(url, map)
 {
   try{
-    let req=new XMLHttpRequest();
+    const req=new XMLHttpRequest();
     req.onreadystatechange=function()
     {  
       try{
@@ -39,88 +41,217 @@ function loadSvgToMap(url, map)
   }
 }
 
+function buildSelectList(options, values) {
+  const select = document.createElement("select")
+  if (values) {
+    for (let i=0; i<options.length; i++) {
+      const optionElement = document.createElement("option");
+
+      optionElement.textContent = options[i];
+      optionElement.value = values[i]
+
+      select.appendChild(optionElement)
+    }
+  } else if (Array.isArray(options)) {
+    for (let i=0; i<options.length; i++) {
+      const optionElement = document.createElement("option");
+
+      optionElement.textContent = options[i];
+      optionElement.value = options[i]
+
+      select.appendChild(optionElement)
+    }
+  } else {
+    for (const option in options) {
+      const optionElement = document.createElement("option");
+
+      optionElement.textContent = option;
+      optionElement.value = options[option]
+
+      select.appendChild(optionElement)
+    }
+  }
+  return select
+}
+
 function editActiveDetail(event) {
-  console.log("editActiveDetail", event)
+  document.getElementById("detailEdit").style.display = "none"
+  document.getElementById("detailSave").style.display = ""
+
+  getPin(document.getElementById("detailPane").dataset.pinId).then((pin) =>{
+    const title = document.getElementById("detailTitle")
+    const titleEdit = document.createElement("input")
+    
+    titleEdit.value = title.firstChild.innerHTML
+    while (title.firstChild)
+      title.removeChild(title.firstChild)
+
+    title.appendChild(titleEdit)
+
+    const table = document.getElementById("detailTable")
+    for (let i=0; i<table.children.length; i++) {
+      let header = table.children[i].children[0]
+      let content = table.children[i].children[1]
+      
+      if (i == 0) {
+        let currentType = content.firstChild.innerHTML
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        let selectElement = buildSelectList(Object.keys(TYPES))
+        selectElement.value = currentType
+        console.log(currentType, Object.keys(TYPES))
+        content.appendChild(selectElement)
+      } else if (i == 1) {
+        let currentParent = content.firstChild.innerHTML
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        findAreas().then((areas) => {
+          console.log(areas)
+          let selectElement = buildSelectList({"<none>": null, ...areas})
+          selectElement.value = areas[currentParent]
+          content.appendChild(selectElement)
+        })
+      } else {
+        let currentText = content.dataset.raw
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        let textarea = document.createElement("textarea")
+        textarea.value = currentText
+        content.appendChild(textarea)
+      }
+    }
+  })
+}
+
+function saveActiveDetail(event) {
+  const table = document.getElementById("detailTable")
+  const pinId = document.getElementById("detailPane").dataset.pinId
+  pin = {
+    "fields": [],
+    "name": document.getElementById("detailTitle").firstChild.value
+  }
+
+  for (let i=0; i<table.children.length; i++) {
+    let header = table.children[i].children[0]
+    let content = table.children[i].children[1]
+    
+    if (i == 0) {
+      pin["type"] = content.firstChild.value
+    } else if (i == 1) {
+      pin["parent"] = content.firstChild.value
+    } else {
+      pin.fields[i-2] = content.firstChild.value
+    }
+  }
+
+  console.log("sendPin", pin)
+
+  sendPin(pinId, pin).then((result) => {
+    openPin(pinId)
+  })
+}
+
+
+function populatePin(pin) {
+  const table = document.getElementById("detailTable")
+  while (table.firstChild)
+    table.removeChild(table.firstChild)
+
+  function addContent(key, val) {
+    const tr = document.createElement("tr")
+    const title   = document.createElement("td")
+    const content = document.createElement("td")
+
+    title.appendChild(document.createTextNode(key))
+    if (typeof val == "string"){
+      content.dataset.raw = val;
+      content.innerHTML = marked(val);
+    } else {
+      content.appendChild(val)
+    }
+
+    tr.appendChild(title)
+    tr.appendChild(content)
+    table.appendChild(tr)
+  }
+
+  
+  addContent("Type", pin.type)
+
+
+  const link = document.createElement("a")
+  addContent("Located In", link)
+
+  if (pin.parent != null) {
+    link.dataset.pinId = pin.parent
+    link.addEventListener("click", openPin)
+    getPin(pin.parent).then((parentPin) => {
+      link.appendChild(document.createTextNode(parentPin.name))
+    })
+  }
+
+  TYPES[pin.type].fields.forEach((field, i) => {
+    addContent(field, pin.fields[i])
+  })
+
+  document.getElementById("detailTitle").innerHTML = "<h3>"+pin.name+"</h3>";
+  document.getElementById("detailImage").src = pin.image;
+
+  if (pin.type == AREA_TYPE) {
+    loadSvgToMap(pin.image, document.getElementById("mapImage"))
+  }
 }
 
 function openPin(event) {
-  pinId = event.target.dataset.pinId;
+  if (event == null) {
+    populatePin(DEFAULT_PIN_DATA)
+    document.getElementById("detailPane").dataset.pinId = undefined
+  }
 
-  getPin(pinId).then((pin) => {
-    let table = document.getElementById("detailTable")
-    while (table.firstChild)
-      table.removeChild(table.firstChild)
+  else if (typeof event === 'string' || event instanceof String) {
+    getPin(event).then(populatePin)
+    document.getElementById("detailPane").dataset.pinId = event
+  }
 
-    function addContent(key, val) {
-      let tr = document.createElement("tr")
-      let title   = document.createElement("td")
-      let content = document.createElement("td")
+  else{
+    getPin(event.target.dataset.pinId).then(populatePin)
+    document.getElementById("detailPane").dataset.pinId = event.target.dataset.pinId
+  }
 
-      title.appendChild(document.createTextNode(key))
-      if (typeof val == "string"){
-        content.appendChild(document.createTextNode(val))
-      } else {
-        content.appendChild(val)
-      }
+  document.getElementById("detailEdit").style.display = ""
+  document.getElementById("detailSave").style.display = "none"
+}
 
-      tr.appendChild(title)
-      tr.appendChild(content)
-      table.appendChild(tr)
-    }
-
-    getType(pin.type).then((type) => {
-      addContent("Type", type.name)
-      if (pin.parent != null) {
-        let link = document.createElement("a")
-        link.dataset.pinId = pin.parent
-        link.addEventListener("click", openPin)
-        addContent("Located In", link)
-        getPin(pin.parent).then((parentPin) => {
-          link.appendChild(document.createTextNode(parentPin.name))
-        })
-      }
-
-      type.fields.forEach((field) => {
-        addContent(field, pin.fields[field])
-      })
-
-      if (type.name.toLowerCase() == "area" || type.name.toLowerCase() == "space") {
-        loadSvgToMap(pin.image, document.getElementById("mapImage"))
-      }
-    })
-
-    document.getElementById("detailTitle").innerHTML = pin.name;
-    document.getElementById("detailImage").src = pin.image;
-  })
+function makeNewPin() {
+  openPin(null)
+  editActiveDetail()
 }
 
 function runFindPins() {
-  let keyword = document.getElementById("searchBox").value
-
-  let types = null
-  getTypes().then((foundTypes) => {
-    types = foundTypes
-  })
+  const keyword = document.getElementById("searchBox").value
 
   findPinsByType(keyword).then((foundPins) => {
-    let searchResultsList = document.getElementById("searchResults");
+    const searchResultsList = document.getElementById("searchResults");
 
     while (searchResultsList.firstChild)
       searchResultsList.removeChild(searchResultsList.firstChild)
 
     Object.keys(foundPins).forEach((type) => {
-      let pinListSection = document.createElement("li");
-      pinListSection.appendChild(document.createTextNode(types[type].name));
+      const pinListSection = document.createElement("li");
+      pinListSection.appendChild(document.createTextNode(type));
       pinListSection.classList.add("typeListing")
-      pinListSection.style.color = types[type].color
+      pinListSection.style.color = TYPES[type].color
       searchResultsList.appendChild(pinListSection);
 
-      let pinListSectionList = document.createElement("ul");
+      const pinListSectionList = document.createElement("ul");
       searchResultsList.appendChild(pinListSectionList)
 
       foundPins[type].forEach((pin) => {
-        let pinListElement = document.createElement("li");
-        let link = document.createElement("a");
+        const pinListElement = document.createElement("li");
+        const link = document.createElement("a");
 
         link.appendChild(document.createTextNode(pin["name"]));
         link.classList.add("pinListing")

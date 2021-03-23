@@ -34,3 +34,6 @@ Inspired by a nifty directory tool I've used, but intended to be better, and ope
 # Delightful things we could do
 - Directory TV in lobby
 - Report problems
+
+# Dependencies / Credits
+- marked.js https://github.com/markedjs/marked
