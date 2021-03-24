@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="universe.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 105.83332 105.83332"
+   height="105.83332mm"
+   width="105.83332mm">
+  <defs
+     id="defs2">
+    <rect
+       id="rect857"
+       height="33.675961"
+       width="74.033659"
+       y="97.199208"
+       x="79.311023" />
+  </defs>
+  <sodipodi:namedview
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="-8"
+     inkscape:window-height="1027"
+     inkscape:window-width="1920"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="36.902053"
+     inkscape:cx="250.11243"
+     inkscape:zoom="0.98994949"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-42.427828,-46.685267)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <rect
+       ry="0"
+       rx="0"
+       y="47.346725"
+       x="43.089287"
+       height="104.51041"
+       width="104.51041"
+       id="rect10"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#141414;stroke-width:1.32291663;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <ellipse
+       ry="39.026039"
+       rx="39.026043"
+       cy="99.601936"
+       cx="95.344498"
+       id="path853"
+       style="fill:#878787;fill-opacity:1;stroke:#000000;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       transform="translate(-21.145441,-10.10012)"
+       y="0"
+       x="27.380671"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect857);fill:#000000;fill-opacity:1;stroke:none"
+       id="text855"
+       xml:space="preserve"><tspan
+         x="105.73351"
+         y="106.85468"><tspan
+           style="text-align:center;text-anchor:middle">THE
+</tspan></tspan><tspan
+         x="88.649339"
+         y="120.08381"><tspan
+           style="text-align:center;text-anchor:middle">UNIVERSE</tspan></tspan></text>
+  </g>
+</svg>
