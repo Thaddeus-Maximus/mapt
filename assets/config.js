@@ -12,7 +12,7 @@ const TYPES = {
 		]
 	},
 	"Supplies": {
-		color: "#090",
+		color: "#180",
 		fields: [
 			"Description",
 			"Manager",
@@ -20,7 +20,7 @@ const TYPES = {
 		]
 	},
 	"Tools": {
-		color: "#b00",
+		color: "#23d",
 		fields: [
 			"Description",
 			"Manager",
@@ -47,6 +47,14 @@ const TYPES = {
 			"Description",
 			"Manager"
 		]
+	},
+	"Utilities": {
+		color: "#d35",
+		fields: [
+			"Description",
+			"Manager",
+			"Service Schedule"
+		]
 	}
 }
 
@@ -62,3 +70,25 @@ const DEFAULT_PIN_DATA = {
 
 const NULL_IMAGE_URL = "assets/null.svg"
 const UNIVERSE_IMAGE_URL = "assets/universe.svg"
+const SEARCH_SPLIT_REGEX = /[^A-Za-z0-9]/
+
+function keywordSplit(x) {
+	let splits = x.toLowerCase().split(SEARCH_SPLIT_REGEX)
+	if (splits.includes("woodshop")){
+		splits.push("wood")
+		splits.push("shop")
+	}
+	if (splits.includes("metalshop")) {
+		splits.push("metal")
+		splits.push("shop")
+	}
+	if (splits.includes("millbit")) {
+		splits.push("mill")
+		splits.push("bit")
+	}
+	if (splits.includes("drillbit")) {
+		splits.push("drill")
+		splits.push("bit")
+	}
+	return splits
+}

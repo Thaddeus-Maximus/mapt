@@ -103,15 +103,6 @@ function populatePins(pin) {
     const image = document.getElementById("pinImage")
     image.setAttribute("src", url);
     image.dataset.modified = "";
-    if (url == NULL_IMAGE_URL)
-      image.dataset.name = ""
-    else
-      image.dataset.name = url.split(/[\/ ]+/).pop()
-
-    // NONONO, this is all wrong. Map image should be of the parent.
-    // pinImage should be of the current thing.
-    
-    
   }
 
   function loadMapImage(url) {
@@ -204,7 +195,6 @@ function editActivePin(event, pin) {
             table.appendChild(tr)
           }
         })
-        console.log(currentType, Object.keys(TYPES))
         content.appendChild(selectElement)
       } else if (i == 1) {
         let currentParent = content.firstChild.innerHTML
@@ -212,7 +202,6 @@ function editActivePin(event, pin) {
           content.removeChild(content.firstChild)
 
         findAreas().then((areas) => {
-          console.log(areas)
           let selectElement = buildSelectList({"<none>": null, ...areas})
           selectElement.value = areas[currentParent]
           content.appendChild(selectElement)
@@ -266,10 +255,8 @@ function saveActivePin(event) {
   if (image.dataset.modified) {
     // TODO: Zombies as a result of changing file extensions
     const filename = pinId+'.'+uploadedImage.name.split(/[. ]+/).pop()
-    console.log("filename:", filename)
     pin.image = filename
     storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
-      console.log("Uploaded new image")
     })
   } else {
     pin.image = image.dataset.name
@@ -300,8 +287,6 @@ function loadNewPinImage(event) {
 
 // Display the selected pin
 function openPin(event, pinId, pin) {
-  console.log("openPin", event, typeof event)
-
   if (event) {
     getPin(event.target.dataset.pinId).then(populatePins)
     document.getElementById("pinPane").dataset.pinId = event.target.dataset.pinId

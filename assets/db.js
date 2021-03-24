@@ -39,7 +39,20 @@ async function sendPin(pinId, data) {
 
   let dbQueryResult = null;
 
-  console.log("pinId", pinId)
+  let keywords = new Set()
+  keywords.add("")
+
+  for (const word of keywordSplit(normData.name))
+    keywords.add(word)
+
+  for (const field of normData.fields)
+    for (const word of keywordSplit(field))
+      keywords.add(word)
+  
+  for (const word of keywordSplit(normData.type))
+    keywords.add(word)
+
+  normData["keywords"] = Array.from(keywords)
 
   if (pinId) {
     dbQueryResult = await db.collection("pins").doc(pinId).set(normData);
@@ -57,7 +70,6 @@ async function getPin(pinId) {
   if (doc.exists) {
     return {...doc.data(), id: doc.id}
   } else {
-    console.log("Pin does not exist.")
     return null
   }
 }
@@ -84,7 +96,10 @@ async function getRootPin() {
 
 async function findPinsByType(text) {
   // Find pins which match <text> and then call f(data)
-  let dbQueryResult = await db.collection("pins").get();
+  let keywords = keywordSplit(text)
+
+  console.log("searching for matches with ", keywords)
+  let dbQueryResult = await db.collection("pins").where("keywords", "array-contains-any", keywords).get();
   let typeMap = {};
   dbQueryResult.forEach((doc) => {
     pin = {...doc.data(), id: doc.id}
@@ -95,7 +110,6 @@ async function findPinsByType(text) {
 
   return typeMap;
 }
-
 
 async function findAreas() {
   // Find pins which match <text> and then call f(data)
