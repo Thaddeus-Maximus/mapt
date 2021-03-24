@@ -5,11 +5,12 @@ window.onload = function() {
 	    }
 	});
   document.getElementById("searchButton").addEventListener("click", runFindPins);
-  document.getElementById("detailEdit").addEventListener("click", editActivePin);
-  document.getElementById("detailSave").addEventListener("click", saveActivePin);
-  document.getElementById("detailDelete").addEventListener("click", deleteActivePin);
+  document.getElementById("pinEdit").addEventListener("click", editActivePin);
+  document.getElementById("pinSave").addEventListener("click", saveActivePin);
+  document.getElementById("pinCancel").addEventListener("click", cancelActivePin);
+  document.getElementById("pinDelete").addEventListener("click", deleteActivePin);
   document.getElementById("newPin").addEventListener("click", makeNewPin);
-  document.getElementById("detailImageUpload").addEventListener("change", loadNewPinImage)
+  document.getElementById("pinImageUpload").addEventListener("change", loadNewPinImage)
   runFindPins();
 }
 
@@ -55,9 +56,9 @@ function buildSelectList(options, values) {
  * CRUD
  */
 
-// Display pin details
+// Display pin pins
 function populatePins(pin) {
-  const table = document.getElementById("detailTable")
+  const table = document.getElementById("pinTable")
   while (table.firstChild)
     table.removeChild(table.firstChild)
 
@@ -96,10 +97,10 @@ function populatePins(pin) {
     addContent(field, pin.fields[i])
   })
 
-  document.getElementById("detailTitle").innerHTML = "<h3>"+pin.name+"</h3>";
+  document.getElementById("pinTitle").innerHTML = "<h3>"+pin.name+"</h3>";
 
   function loadImage(url) {
-    const image = document.getElementById("detailImage")
+    const image = document.getElementById("pinImage")
     image.setAttribute("src", url);
     image.dataset.modified = "";
     if (url == NULL_IMAGE_URL)
@@ -112,7 +113,7 @@ function populatePins(pin) {
   }
 
   if (pin.image) {
-    document.getElementById("detailImage").dataset.name = pin.image
+    document.getElementById("pinImage").dataset.name = pin.image
     storageRef.child('images/'+pin.image).getDownloadURL().then(loadImage)
   }
   else{
@@ -122,7 +123,7 @@ function populatePins(pin) {
 
 // Delete active pin
 function deleteActivePin(event) {
-  pinId = document.getElementById("detailPane").dataset.pinId
+  pinId = document.getElementById("pinPane").dataset.pinId
   if (confirm("Are you sure you want to delete pin " + pinId + "?")) {
     deletePin(pinId);
     runFindPins();
@@ -131,13 +132,14 @@ function deleteActivePin(event) {
 
 // Edit active pin
 function editActivePin(event, pin) {
-  document.getElementById("detailEdit").style.display = "none"
-  document.getElementById("detailSave").style.display = ""
-  document.getElementById("detailDelete").style.display = ""
-  document.getElementById("detailImageUpload").style.display = ""
+  document.getElementById("pinEdit").style.display = "none"
+  document.getElementById("pinSave").style.display = ""
+  document.getElementById("pinDelete").style.display = ""
+  document.getElementById("pinCancel").style.display = ""
+  document.getElementById("pinImageUpload").style.display = ""
 
   function convertToEdit(pin) {
-    const title = document.getElementById("detailTitle")
+    const title = document.getElementById("pinTitle")
     const titleEdit = document.createElement("input")
     
     titleEdit.value = title.firstChild.innerHTML
@@ -146,7 +148,7 @@ function editActivePin(event, pin) {
 
     title.appendChild(titleEdit)
 
-    const table = document.getElementById("detailTable")
+    const table = document.getElementById("pinTable")
     for (let i=0; i<table.children.length; i++) {
       let header = table.children[i].children[0]
       let content = table.children[i].children[1]
@@ -186,17 +188,21 @@ function editActivePin(event, pin) {
   if (pin)
     convertToEdit(pin)
   else
-    getPin(document.getElementById("detailPane").dataset.pinId).then(convertToEdit)
+    getPin(document.getElementById("pinPane").dataset.pinId).then(convertToEdit)
+}
+
+function cancelActivePin(event) {
+  openPin(null, document.getElementById("pinPane").dataset.pinId, null)
 }
 
 // Save active pin
 function saveActivePin(event) {
-  const table = document.getElementById("detailTable")
-  const pinId = document.getElementById("detailPane").dataset.pinId
-  const image = document.getElementById("detailImage")
+  const table = document.getElementById("pinTable")
+  const pinId = document.getElementById("pinPane").dataset.pinId
+  const image = document.getElementById("pinImage")
   pin = {
     "fields": [],
-    "name": document.getElementById("detailTitle").firstChild.value
+    "name": document.getElementById("pinTitle").firstChild.value
   }
 
   for (let i=0; i<table.children.length; i++) {
@@ -214,6 +220,7 @@ function saveActivePin(event) {
 
   if (image.dataset.modified) {
     const filename = pinId+'.'+uploadedImage.name.split(/[. ]+/).pop()
+    console.log("filename:", filename)
     pin.image = filename
     storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
       console.log("Uploaded new image")
@@ -224,20 +231,21 @@ function saveActivePin(event) {
 
   sendPin(pinId, pin).then((result) => {
     populatePins(pin)
-    document.getElementById("detailPane").dataset.pinId = pinId
+    document.getElementById("pinPane").dataset.pinId = pinId
   })
 
-  document.getElementById("detailEdit").style.display = ""
-  document.getElementById("detailSave").style.display = "none"
-  document.getElementById("detailDelete").style.display = ""
-  document.getElementById("detailImageUpload").style.display = "none"
+  document.getElementById("pinEdit").style.display = ""
+  document.getElementById("pinSave").style.display = "none"
+  document.getElementById("pinDelete").style.display = ""
+  document.getElementById("pinCancel").style.display = "none"
+  document.getElementById("pinImageUpload").style.display = "none"
 }
 
 // Load pin from user's filesystem
 let uploadedImage = null
 
 function loadNewPinImage(event) {
-  var image = document.getElementById('detailImage');
+  var image = document.getElementById('pinImage');
   image.src = URL.createObjectURL(event.target.files[0]);
   uploadedImage = event.target.files[0]
   image.dataset.modified = "yes";
@@ -250,23 +258,24 @@ function openPin(event, pinId, pin) {
 
   if (event) {
     getPin(event.target.dataset.pinId).then(populatePins)
-    document.getElementById("detailPane").dataset.pinId = event.target.dataset.pinId
+    document.getElementById("pinPane").dataset.pinId = event.target.dataset.pinId
   }
 
   else if (pinId) {
     getPin(pinId).then(populatePins)
-    document.getElementById("detailPane").dataset.pinId = pinId
+    document.getElementById("pinPane").dataset.pinId = pinId
   }
 
   else {
     populatePins(pin)
-    document.getElementById("detailPane").dataset.pinId = pinId
+    document.getElementById("pinPane").dataset.pinId = pinId
   }
 
-  document.getElementById("detailEdit").style.display = ""
-  document.getElementById("detailSave").style.display = "none"
-  document.getElementById("detailDelete").style.display = ""
-  document.getElementById("detailImageUpload").style.display = "none"
+  document.getElementById("pinEdit").style.display = ""
+  document.getElementById("pinSave").style.display = "none"
+  document.getElementById("pinDelete").style.display = ""
+  document.getElementById("pinCancel").style.display = "none"
+  document.getElementById("pinImageUpload").style.display = "none"
 }
 
 // Make a new pin: Display a default pin and get into edit mode
@@ -275,7 +284,7 @@ function makeNewPin() {
   editActivePin(null, DEFAULT_PIN_DATA)
 }
 
-// Run search on all pins, show the first one in detail
+// Run search on all pins, show the first one in pin
 function runFindPins() {
   const keyword = document.getElementById("searchBox").value
 

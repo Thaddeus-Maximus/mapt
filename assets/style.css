@@ -3,10 +3,12 @@
 #navPane {
 	width: 330px;
 	margin-left: 5px;
+	overflow-y: scroll;
 }
-#detailPane {
+#pinPane {
 	width: 330px;
 	margin-left: 355px;
+	overflow-y: scroll;
 }
 #mapPane {
 	width: 700px;
@@ -62,6 +64,6 @@ textarea {
 	height: 10em;
 }
 
-#detailImageUploadLabel {
+#pinImageUploadLabel {
 	background-color: #ccc;
 }
