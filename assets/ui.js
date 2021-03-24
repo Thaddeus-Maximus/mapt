@@ -156,6 +156,8 @@ function saveActiveDetail(event) {
     storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
       console.log("Uploaded new image")
     })
+  } else {
+    pin["image"] = image.dataset.name
   }
 
   sendPin(pinId, pin).then((result) => {
@@ -163,8 +165,6 @@ function saveActiveDetail(event) {
   })
 
   console.log("image url:", image.src)
-
-
 }
 
 let uploadedImage = null
@@ -173,7 +173,7 @@ function loadNewPinImage(event) {
   var image = document.getElementById('detailImage');
   image.src = URL.createObjectURL(event.target.files[0]);
   uploadedImage = event.target.files[0]
-  image.dataset.modified = true;
+  image.dataset.modified = "yes";
   //image.dataset.imageurl = image.src
 };
 
@@ -222,16 +222,19 @@ function populatePin(pin) {
   function loadImage(url) {
     const image = document.getElementById("detailImage")
     image.setAttribute("src", url);
-    image.dataset.modified = false;
+    image.dataset.modified = "";
     if (pin.type == AREA_TYPE) {
       document.getElementById("mapImage").setAttribute("src", url);
     }
   }
 
-  if (pin.image)
+  if (pin.image) {
+    document.getElementById("detailImage").dataset.name = pin.image
     storageRef.child('images/'+pin.image).getDownloadURL().then(loadImage)
-  else
+  }
+  else{
     loadImage(NULL_IMAGE_URL)
+  }
 }
 
 function openPin(event) {
