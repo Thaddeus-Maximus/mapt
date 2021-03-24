@@ -1,12 +1,13 @@
 
 <head>
-  <link rel="stylesheet" href="style.css">
-  <script src="config.js"></script>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-firestore.js"></script>
-  <script src="db.js"></script>
-  <script src="ui.js"></script>
-  <script src="marked.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-storage.js"></script>
+  <script src="assets/db.js"></script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/marked.min.js"></script>
 </head>
 
 <body>
@@ -24,6 +25,7 @@
     <button id="detailEdit" style="display:none">Edit</button>
     <button id="detailSave" style="display:none">Save</button>
     <img id="detailImage" width="100%"/>
+    <input type="file"  accept="image/*" name="image" id="detailImageUpload" style="display:none;">
     <table id="detailTable" class="kvTable">
       <tr class="detailRow">
         <td class="detailLabel">Label</td>

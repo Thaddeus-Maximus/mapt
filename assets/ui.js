@@ -8,6 +8,7 @@ window.onload = function() {
   document.getElementById("detailEdit").addEventListener("click", editActiveDetail);
   document.getElementById("detailSave").addEventListener("click", saveActiveDetail);
   document.getElementById("newPin").addEventListener("click", makeNewPin);
+  document.getElementById("detailImageUpload").addEventListener("change", loadNewPinImage)
   runFindPins();
 }
 
@@ -77,6 +78,7 @@ function buildSelectList(options, values) {
 function editActiveDetail(event) {
   document.getElementById("detailEdit").style.display = "none"
   document.getElementById("detailSave").style.display = ""
+  document.getElementById("detailImageUpload").style.display = ""
 
   getPin(document.getElementById("detailPane").dataset.pinId).then((pin) =>{
     const title = document.getElementById("detailTitle")
@@ -129,6 +131,7 @@ function editActiveDetail(event) {
 function saveActiveDetail(event) {
   const table = document.getElementById("detailTable")
   const pinId = document.getElementById("detailPane").dataset.pinId
+  const image = document.getElementById("detailImage")
   pin = {
     "fields": [],
     "name": document.getElementById("detailTitle").firstChild.value
@@ -147,13 +150,32 @@ function saveActiveDetail(event) {
     }
   }
 
-  console.log("sendPin", pin)
+  if (image.dataset.modified) {
+    const filename = pinId+uploadedImage.name.split(/[. ]+/).pop()
+    pin["image"] = filename
+    storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
+      console.log("Uploaded new image")
+    })
+  }
 
   sendPin(pinId, pin).then((result) => {
     openPin(pinId)
   })
+
+  console.log("image url:", image.src)
+
+
 }
 
+let uploadedImage = null
+
+function loadNewPinImage(event) {
+  var image = document.getElementById('detailImage');
+  image.src = URL.createObjectURL(event.target.files[0]);
+  uploadedImage = event.target.files[0]
+  image.dataset.modified = true;
+  //image.dataset.imageurl = image.src
+};
 
 function populatePin(pin) {
   const table = document.getElementById("detailTable")
@@ -177,10 +199,8 @@ function populatePin(pin) {
     tr.appendChild(content)
     table.appendChild(tr)
   }
-
   
   addContent("Type", pin.type)
-
 
   const link = document.createElement("a")
   addContent("Located In", link)
@@ -198,11 +218,20 @@ function populatePin(pin) {
   })
 
   document.getElementById("detailTitle").innerHTML = "<h3>"+pin.name+"</h3>";
-  document.getElementById("detailImage").src = pin.image;
 
-  if (pin.type == AREA_TYPE) {
-    loadSvgToMap(pin.image, document.getElementById("mapImage"))
+  function loadImage(url) {
+    const image = document.getElementById("detailImage")
+    image.setAttribute("src", url);
+    image.dataset.modified = false;
+    if (pin.type == AREA_TYPE) {
+      document.getElementById("mapImage").setAttribute("src", url);
+    }
   }
+
+  if (pin.image)
+    storageRef.child('images/'+pin.image).getDownloadURL().then(loadImage)
+  else
+    loadImage(NULL_IMAGE_URL)
 }
 
 function openPin(event) {
@@ -223,6 +252,7 @@ function openPin(event) {
 
   document.getElementById("detailEdit").style.display = ""
   document.getElementById("detailSave").style.display = "none"
+  document.getElementById("detailImageUpload").style.display = "none"
 }
 
 function makeNewPin() {

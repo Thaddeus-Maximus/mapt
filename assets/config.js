@@ -59,3 +59,5 @@ const DEFAULT_PIN_DATA = {
 "fields": TYPES[DEFAULT_TYPE].fields,
 "coords": [{x:0, y:0}]
 }
+
+const NULL_IMAGE_URL = "assets/null.svg"

@@ -12,6 +12,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 let db = firebase.firestore();
+let storage = firebase.storage();
+let storageRef = storage.ref()
 
 // Functions to work with the database
 
@@ -79,7 +81,6 @@ async function findPinsByType(text) {
   let dbQueryResult = await db.collection("pins").get();
   let typeMap = {};
   dbQueryResult.forEach((doc) => {
-    console.log(doc)
     pin = {...doc.data(), id: doc.id}
     if (! (pin.type in typeMap))
       typeMap[pin.type] = []
