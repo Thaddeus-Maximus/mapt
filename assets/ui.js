@@ -5,43 +5,18 @@ window.onload = function() {
 	    }
 	});
   document.getElementById("searchButton").addEventListener("click", runFindPins);
-  document.getElementById("detailEdit").addEventListener("click", editActiveDetail);
-  document.getElementById("detailSave").addEventListener("click", saveActiveDetail);
-  document.getElementById("detailDelete").addEventListener("click", deleteActiveDetail);
+  document.getElementById("detailEdit").addEventListener("click", editActivePin);
+  document.getElementById("detailSave").addEventListener("click", saveActivePin);
+  document.getElementById("detailDelete").addEventListener("click", deleteActivePin);
   document.getElementById("newPin").addEventListener("click", makeNewPin);
   document.getElementById("detailImageUpload").addEventListener("change", loadNewPinImage)
   runFindPins();
 }
 
-function loadSvgToMap(url, map)
-{
-  try{
-    const req=new XMLHttpRequest();
-    req.onreadystatechange=function()
-    {  
-      try{
-        if(req.readyState == 4)
-        {   if(req.status == 200)
-            {
-              while (map.firstChild)
-                map.removeChild(map.firstChild)
-              map.appendChild(req.responseXML.documentElement);
-            }
-            else
-            {   console.log("URL "+url+" not available");
-            }
-        }
-      }catch(e){
-        console.log("Error parsing SVG: ", e)
-      }
-    }
-    req.open("POST", url, true);
-    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    req.send();
-  }catch(e){
-    console.log("Error loading SVG: ", e)
-  }
-}
+
+/*
+ * Utility functions
+ */
 
 function buildSelectList(options, values) {
   const select = document.createElement("select")
@@ -76,127 +51,12 @@ function buildSelectList(options, values) {
   return select
 }
 
-function deleteActiveDetail(event) {
-  pinId = document.getElementById("detailPane").dataset.pinId
-  if (confirm("Are you sure you want to delete pin " + pinId + "?")) {
-    deletePin(pinId);
-    runFindPins();
-  }
-}
+/*
+ * CRUD
+ */
 
-function editActiveDetail(event, pin) {
-  document.getElementById("detailEdit").style.display = "none"
-  document.getElementById("detailSave").style.display = ""
-  document.getElementById("detailDelete").style.display = ""
-  document.getElementById("detailImageUpload").style.display = ""
-
-  function convertToEdit(pin) {
-    const title = document.getElementById("detailTitle")
-    const titleEdit = document.createElement("input")
-    
-    titleEdit.value = title.firstChild.innerHTML
-    while (title.firstChild)
-      title.removeChild(title.firstChild)
-
-    title.appendChild(titleEdit)
-
-    const table = document.getElementById("detailTable")
-    for (let i=0; i<table.children.length; i++) {
-      let header = table.children[i].children[0]
-      let content = table.children[i].children[1]
-      
-      if (i == 0) {
-        let currentType = content.firstChild.innerHTML
-        while (content.firstChild)
-          content.removeChild(content.firstChild)
-
-        let selectElement = buildSelectList(Object.keys(TYPES))
-        selectElement.value = currentType
-        console.log(currentType, Object.keys(TYPES))
-        content.appendChild(selectElement)
-      } else if (i == 1) {
-        let currentParent = content.firstChild.innerHTML
-        while (content.firstChild)
-          content.removeChild(content.firstChild)
-
-        findAreas().then((areas) => {
-          console.log(areas)
-          let selectElement = buildSelectList({"<none>": null, ...areas})
-          selectElement.value = areas[currentParent]
-          content.appendChild(selectElement)
-        })
-      } else {
-        let currentText = content.dataset.raw
-        while (content.firstChild)
-          content.removeChild(content.firstChild)
-
-        let textarea = document.createElement("textarea")
-        textarea.value = currentText
-        content.appendChild(textarea)
-      }
-    }
-  }
-
-  if (pin)
-    convertToEdit(pin)
-  else
-    getPin(document.getElementById("detailPane").dataset.pinId).then(convertToEdit)
-}
-
-function saveActiveDetail(event) {
-  const table = document.getElementById("detailTable")
-  const pinId = document.getElementById("detailPane").dataset.pinId
-  const image = document.getElementById("detailImage")
-  pin = {
-    "fields": [],
-    "name": document.getElementById("detailTitle").firstChild.value
-  }
-
-  for (let i=0; i<table.children.length; i++) {
-    let header = table.children[i].children[0]
-    let content = table.children[i].children[1]
-    
-    if (i == 0) {
-      pin["type"] = content.firstChild.value
-    } else if (i == 1) {
-      pin["parent"] = content.firstChild.value
-    } else {
-      pin.fields[i-2] = content.firstChild.value
-    }
-  }
-
-  if (image.dataset.modified) {
-    const filename = pinId+'.'+uploadedImage.name.split(/[. ]+/).pop()
-    pin.image = filename
-    storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
-      console.log("Uploaded new image")
-    })
-  } else {
-    pin.image = image.dataset.name
-  }
-
-  sendPin(pinId, pin).then((result) => {
-    populatePin(pin)
-    document.getElementById("detailPane").dataset.pinId = pinId
-  })
-
-  document.getElementById("detailEdit").style.display = ""
-  document.getElementById("detailSave").style.display = "none"
-  document.getElementById("detailDelete").style.display = ""
-  document.getElementById("detailImageUpload").style.display = "none"
-}
-
-let uploadedImage = null
-
-function loadNewPinImage(event) {
-  var image = document.getElementById('detailImage');
-  image.src = URL.createObjectURL(event.target.files[0]);
-  uploadedImage = event.target.files[0]
-  image.dataset.modified = "yes";
-  //image.dataset.imageurl = image.src
-};
-
-function populatePin(pin) {
+// Display pin details
+function populatePins(pin) {
   const table = document.getElementById("detailTable")
   while (table.firstChild)
     table.removeChild(table.firstChild)
@@ -260,21 +120,146 @@ function populatePin(pin) {
   }
 }
 
+// Delete active pin
+function deleteActivePin(event) {
+  pinId = document.getElementById("detailPane").dataset.pinId
+  if (confirm("Are you sure you want to delete pin " + pinId + "?")) {
+    deletePin(pinId);
+    runFindPins();
+  }
+}
+
+// Edit active pin
+function editActivePin(event, pin) {
+  document.getElementById("detailEdit").style.display = "none"
+  document.getElementById("detailSave").style.display = ""
+  document.getElementById("detailDelete").style.display = ""
+  document.getElementById("detailImageUpload").style.display = ""
+
+  function convertToEdit(pin) {
+    const title = document.getElementById("detailTitle")
+    const titleEdit = document.createElement("input")
+    
+    titleEdit.value = title.firstChild.innerHTML
+    while (title.firstChild)
+      title.removeChild(title.firstChild)
+
+    title.appendChild(titleEdit)
+
+    const table = document.getElementById("detailTable")
+    for (let i=0; i<table.children.length; i++) {
+      let header = table.children[i].children[0]
+      let content = table.children[i].children[1]
+      
+      if (i == 0) {
+        let currentType = content.firstChild.innerHTML
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        let selectElement = buildSelectList(Object.keys(TYPES))
+        selectElement.value = currentType
+        console.log(currentType, Object.keys(TYPES))
+        content.appendChild(selectElement)
+      } else if (i == 1) {
+        let currentParent = content.firstChild.innerHTML
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        findAreas().then((areas) => {
+          console.log(areas)
+          let selectElement = buildSelectList({"<none>": null, ...areas})
+          selectElement.value = areas[currentParent]
+          content.appendChild(selectElement)
+        })
+      } else {
+        let currentText = content.dataset.raw
+        while (content.firstChild)
+          content.removeChild(content.firstChild)
+
+        let textarea = document.createElement("textarea")
+        textarea.value = currentText
+        content.appendChild(textarea)
+      }
+    }
+  }
+
+  if (pin)
+    convertToEdit(pin)
+  else
+    getPin(document.getElementById("detailPane").dataset.pinId).then(convertToEdit)
+}
+
+// Save active pin
+function saveActivePin(event) {
+  const table = document.getElementById("detailTable")
+  const pinId = document.getElementById("detailPane").dataset.pinId
+  const image = document.getElementById("detailImage")
+  pin = {
+    "fields": [],
+    "name": document.getElementById("detailTitle").firstChild.value
+  }
+
+  for (let i=0; i<table.children.length; i++) {
+    let header = table.children[i].children[0]
+    let content = table.children[i].children[1]
+    
+    if (i == 0) {
+      pin["type"] = content.firstChild.value
+    } else if (i == 1) {
+      pin["parent"] = content.firstChild.value
+    } else {
+      pin.fields[i-2] = content.firstChild.value
+    }
+  }
+
+  if (image.dataset.modified) {
+    const filename = pinId+'.'+uploadedImage.name.split(/[. ]+/).pop()
+    pin.image = filename
+    storageRef.child("images/"+filename).put(uploadedImage).then((snapshot) => {
+      console.log("Uploaded new image")
+    })
+  } else {
+    pin.image = image.dataset.name
+  }
+
+  sendPin(pinId, pin).then((result) => {
+    populatePins(pin)
+    document.getElementById("detailPane").dataset.pinId = pinId
+  })
+
+  document.getElementById("detailEdit").style.display = ""
+  document.getElementById("detailSave").style.display = "none"
+  document.getElementById("detailDelete").style.display = ""
+  document.getElementById("detailImageUpload").style.display = "none"
+}
+
+// Load pin from user's filesystem
+let uploadedImage = null
+
+function loadNewPinImage(event) {
+  var image = document.getElementById('detailImage');
+  image.src = URL.createObjectURL(event.target.files[0]);
+  uploadedImage = event.target.files[0]
+  image.dataset.modified = "yes";
+  //image.dataset.imageurl = image.src
+};
+
+// Display the selected pin
 function openPin(event, pinId, pin) {
   console.log("openPin", event, typeof event)
 
   if (event) {
-    getPin(event.target.dataset.pinId).then(populatePin)
+    getPin(event.target.dataset.pinId).then(populatePins)
     document.getElementById("detailPane").dataset.pinId = event.target.dataset.pinId
   }
 
   else if (pinId) {
-    getPin(pinId).then(populatePin)
+    getPin(pinId).then(populatePins)
     document.getElementById("detailPane").dataset.pinId = pinId
   }
 
   else {
-    populatePin(pin)
+    populatePins(pin)
     document.getElementById("detailPane").dataset.pinId = pinId
   }
 
@@ -284,11 +269,13 @@ function openPin(event, pinId, pin) {
   document.getElementById("detailImageUpload").style.display = "none"
 }
 
+// Make a new pin: Display a default pin and get into edit mode
 function makeNewPin() {
   openPin(null, "", DEFAULT_PIN_DATA)
-  editActiveDetail(null, DEFAULT_PIN_DATA)
+  editActivePin(null, DEFAULT_PIN_DATA)
 }
 
+// Run search on all pins, show the first one in detail
 function runFindPins() {
   const keyword = document.getElementById("searchBox").value
 
