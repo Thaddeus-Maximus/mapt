@@ -61,3 +61,4 @@ const DEFAULT_PIN_DATA = {
 }
 
 const NULL_IMAGE_URL = "assets/null.svg"
+const UNIVERSE_IMAGE_URL = "assets/universe.svg"

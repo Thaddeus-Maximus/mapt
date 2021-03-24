@@ -11,28 +11,30 @@
 </head>
 
 <body>
-  <div id="navPane" class="pane">
-    <input id="searchBox">
-    <button id="searchButton">>></button>
-    <button id="newPin">New [+]</button>
-    <ul id="searchResults">
-      <li class="typeheader">Sample Type Header</li>
-      <li><a href="#">Sample Pin</a></li>
-    </ul>
-  </div>
-  <div id="pinPane" class="pane">
-    <div id="pinTitle"></div>
-    <button id="pinEdit" style="display:none">Edit</button>
-    <button id="pinSave" style="display:none">Save</button>
-    <button id="pinDelete" style="display:none">Delete [-]</button>
-    <button id="pinCancel" style="display:none">Cancel</button>
-    <img id="pinImage" width="100%"/>
-    <input type="file"  accept="image/*" name="image" id="pinImageUpload" style="display:none;">
-    <table id="pinTable" class="kvTable">
-    </table>
-  </div>
-  <div id="mapPane" class="pane">
-    <div id="mapImage"></div>
+  <div class="container">
+    <div id="navPane" class="pane">
+      <input id="searchBox">
+      <button id="searchButton">>></button>
+      <button id="newPin">New [+]</button>
+      <ul id="searchResults">
+        <li class="typeheader">Sample Type Header</li>
+        <li><a href="#">Sample Pin</a></li>
+      </ul>
+    </div>
+    <div id="pinPane" class="pane">
+      <div id="pinTitle"></div>
+      <button id="pinEdit" style="display:none">Edit</button>
+      <button id="pinSave" style="display:none">Save</button>
+      <button id="pinDelete" style="display:none">Delete [-]</button>
+      <button id="pinCancel" style="display:none">Cancel</button>
+      <img id="pinImage" width="100%"/>
+      <input type="file"  accept="image/*" name="image" id="pinImageUpload" style="display:none;">
+      <table id="pinTable" class="kvTable">
+      </table>
+    </div>
+    <div id="mapPane" class="pane">
+      <img id="mapImage"></img>
+    </div>
   </div>
 </body>
 

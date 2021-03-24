@@ -99,7 +99,7 @@ function populatePins(pin) {
 
   document.getElementById("pinTitle").innerHTML = "<h3>"+pin.name+"</h3>";
 
-  function loadImage(url) {
+  function loadPinImage(url) {
     const image = document.getElementById("pinImage")
     image.setAttribute("src", url);
     image.dataset.modified = "";
@@ -107,17 +107,35 @@ function populatePins(pin) {
       image.dataset.name = ""
     else
       image.dataset.name = url.split(/[\/ ]+/).pop()
-    if (pin.type == AREA_TYPE) {
-      document.getElementById("mapImage").setAttribute("src", url);
-    }
+
+    // NONONO, this is all wrong. Map image should be of the parent.
+    // pinImage should be of the current thing.
+    
+    
+  }
+
+  function loadMapImage(url) {
+    document.getElementById("mapImage").setAttribute("src", url);
   }
 
   if (pin.image) {
     document.getElementById("pinImage").dataset.name = pin.image
-    storageRef.child('images/'+pin.image).getDownloadURL().then(loadImage)
+    storageRef.child('images/'+pin.image).getDownloadURL().then(loadPinImage)
   }
   else{
-    loadImage(NULL_IMAGE_URL)
+    loadPinImage(NULL_IMAGE_URL)
+  }
+
+  if (pin.parent) {
+    getPin(pin.parent).then((parentPin) => {
+      if (parentPin.image) {
+        storageRef.child('images/'+parentPin.image).getDownloadURL().then(loadMapImage)
+      } else {
+        loadMapImage(NULL_IMAGE_URL)
+      }
+    })
+  } else {
+    loadMapImage(UNIVERSE_IMAGE_URL)
   }
 }
 
@@ -149,6 +167,7 @@ function editActivePin(event, pin) {
     title.appendChild(titleEdit)
 
     const table = document.getElementById("pinTable")
+    let textareas = []
     for (let i=0; i<table.children.length; i++) {
       let header = table.children[i].children[0]
       let content = table.children[i].children[1]
@@ -160,6 +179,31 @@ function editActivePin(event, pin) {
 
         let selectElement = buildSelectList(Object.keys(TYPES))
         selectElement.value = currentType
+        selectElement.addEventListener("change", (event) => {
+          const fields = TYPES[event.target.value].fields;
+          while (table.children.length > 2)
+            table.removeChild(table.children[2])
+
+          for (let i=0; i<fields.length; i++) {
+            const tr      = document.createElement("tr")
+            const title   = document.createElement("td")
+            const content = document.createElement("td")
+
+            title.appendChild(document.createTextNode(fields[i]))
+            if (textareas.length > i){
+              content.appendChild(textareas[i])
+            } else {
+              let textarea = document.createElement("textarea")
+              textarea.value = ""
+              content.appendChild(textarea)
+              textareas.push(textarea)
+            }
+
+            tr.appendChild(title)
+            tr.appendChild(content)
+            table.appendChild(tr)
+          }
+        })
         console.log(currentType, Object.keys(TYPES))
         content.appendChild(selectElement)
       } else if (i == 1) {
@@ -181,6 +225,7 @@ function editActivePin(event, pin) {
         let textarea = document.createElement("textarea")
         textarea.value = currentText
         content.appendChild(textarea)
+        textareas.push(textarea)
       }
     }
   }
@@ -219,6 +264,7 @@ function saveActivePin(event) {
   }
 
   if (image.dataset.modified) {
+    // TODO: Zombies as a result of changing file extensions
     const filename = pinId+'.'+uploadedImage.name.split(/[. ]+/).pop()
     console.log("filename:", filename)
     pin.image = filename
