@@ -28,12 +28,18 @@ let storageRef = storage.ref()
  * - coords        (list of tuples of x-y points... a point if one tuple, a polygon if more than one (lines are polygons right?))
  */
 
+async function deletePin(pinId) {
+  return await db.collection("pins").doc(pinId).delete();
+}
+
 async function sendPin(pinId, data) {
   // ensure that the given pin exists
   // create if data.id undefined
   const normData = {... DEFAULT_PIN_DATA, ...data};
 
   let dbQueryResult = null;
+
+  console.log("pinId", pinId)
 
   if (pinId) {
     dbQueryResult = await db.collection("pins").doc(pinId).set(normData);

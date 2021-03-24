@@ -55,7 +55,7 @@ const DEFAULT_PIN_DATA = {
 "parent": null,
 "type": DEFAULT_TYPE,
 "name": "new_pin",
-"picture": "null.svg",
+"image": null,
 "fields": TYPES[DEFAULT_TYPE].fields,
 "coords": [{x:0, y:0}]
 }
