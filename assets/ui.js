@@ -62,6 +62,10 @@ function logIn(event) {
 
   console.log(window.location.href)
   console.log(email)
+
+  // switch to signInWithEmailAndPassword for login
+  // create... creates.
+
   firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
     window.alert("Welcome aboard. An admin must approve you for edit access.")
   }).catch((error) => {
