@@ -11,9 +11,64 @@ window.onload = function() {
   document.getElementById("pinDelete").addEventListener("click", deleteActivePin);
   document.getElementById("newPin").addEventListener("click", makeNewPin);
   document.getElementById("pinImageUpload").addEventListener("change", loadNewPinImage)
+  document.getElementById("loginButton").addEventListener("click", logIn)
   runFindPins();
 }
 
+
+/*
+ * Firebase auth
+ */ 
+
+var uiConfig = {
+  signInSuccessUrl: '<url-to-redirect-to-on-success>',
+  signInOptions: [
+    // Leave the lines as is for the providers you want to offer your users.
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+    firebase.auth.GithubAuthProvider.PROVIDER_ID,
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+    firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
+  ],
+  // tosUrl and privacyPolicyUrl accept either url string or a callback
+  // function.
+  // Terms of service url/callback.
+  tosUrl: '<your-tos-url>',
+  // Privacy policy url/callback.
+  privacyPolicyUrl: function() {
+    window.location.assign('<your-privacy-policy-url>');
+  }
+};
+
+// Initialize the FirebaseUI Widget using Firebase.
+//var ui = new firebaseui.auth.AuthUI(firebase.auth());
+// The start method will wait until the DOM is loaded.
+//ui.start('#firebaseui-auth-container', uiConfig);
+
+function logIn(event) {
+  let email = window.prompt("Please provide your email.")
+  if (email != window.prompt("Please confirm your email.")) {
+    window.alert("Emails do not match.")
+    return null;
+  }
+
+  let password = window.prompt("Please provide your password.")
+  if (password != window.prompt("Please confirm your password.")) {
+    window.alert("Emails do not match.")
+    return null;
+  }
+
+  console.log(window.location.href)
+  console.log(email)
+  firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
+    window.alert("Welcome aboard. An admin must approve you for edit access.")
+  }).catch((error) => {
+    console.log(error)
+  })
+  
+}
 
 /*
  * Utility functions

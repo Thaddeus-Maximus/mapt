@@ -5,14 +5,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
   <script src="assets/db.js"></script>
   <script src="assets/ui.js"></script>
   <script src="assets/marked.min.js"></script>
 </head>
 
 <body>
+  <div id="firebaseui-auth-container"></div>
   <div class="container">
     <div id="navPane" class="pane">
+      <button id="loginButton">Log In</button>
       <input id="searchBox">
       <button id="searchButton">>></button>
       <button id="newPin">New [+]</button>
