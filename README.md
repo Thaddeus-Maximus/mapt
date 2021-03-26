@@ -37,3 +37,29 @@ Inspired by a nifty directory tool I've used, but intended to be better, and ope
 
 # Dependencies / Credits
 - marked.js https://github.com/markedjs/marked
+
+# Setup
+
+In the Firebase Console, create a Cloud Firestore and Storage.
+
+Use this ruleset for each:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read: if true;
+      //allow write: if root.child('users').child(request.auth.uid).child('admin').val();
+    	allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin;
+    }
+  }
+}
+```
+
+Create collections `pins` and `users` in the Firestore.
+Create folder `images` in the Storage.
+
+Set up authentication. Enable only Email/Password authentication.
+
+Create a new user. Copy their uid. Go into the Firestore `users` collection, and create a new document with a field `admin` set to the boolean `true`.
