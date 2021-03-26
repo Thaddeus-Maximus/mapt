@@ -1,4 +1,8 @@
 
+.depressed {
+	background-color: #888;
+}
+
 .container {
 	display: table;
 	width: 100%;

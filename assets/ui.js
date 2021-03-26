@@ -11,67 +11,36 @@ window.onload = function() {
   document.getElementById("pinDelete").addEventListener("click", deleteActivePin);
   document.getElementById("newPin").addEventListener("click", makeNewPin);
   document.getElementById("pinImageUpload").addEventListener("change", loadNewPinImage)
-  document.getElementById("loginButton").addEventListener("click", logIn)
+  document.getElementById("loginButton").addEventListener("click", (event) => {
+    window.location.href = 'login.html';
+  })
   runFindPins();
 }
 
+let allowedToEdit = false
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    db.collection("users").doc(user.uid).get().then((dbuser) => {
+      if (dbuser.data().admin) {
+        allowedToEdit = true
+        runFindPins()
+      } else {
+        console.log("Current user is not an admin. Shutting off UI controls for editing, etc.")
+      }
+    })
+  } else {
+    console.log("Not logged in. Shutting off UI controls for editing, etc.")
+  }
+})
 
 /*
  * Firebase auth
  */ 
 
-var uiConfig = {
-  signInSuccessUrl: '<url-to-redirect-to-on-success>',
-  signInOptions: [
-    // Leave the lines as is for the providers you want to offer your users.
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    firebase.auth.GithubAuthProvider.PROVIDER_ID,
-    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-    firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
-  ],
-  // tosUrl and privacyPolicyUrl accept either url string or a callback
-  // function.
-  // Terms of service url/callback.
-  tosUrl: '<your-tos-url>',
-  // Privacy policy url/callback.
-  privacyPolicyUrl: function() {
-    window.location.assign('<your-privacy-policy-url>');
-  }
-};
-
-// Initialize the FirebaseUI Widget using Firebase.
-//var ui = new firebaseui.auth.AuthUI(firebase.auth());
-// The start method will wait until the DOM is loaded.
-//ui.start('#firebaseui-auth-container', uiConfig);
-
-function logIn(event) {
-  let email = window.prompt("Please provide your email.")
-  if (email != window.prompt("Please confirm your email.")) {
-    window.alert("Emails do not match.")
-    return null;
-  }
-
-  let password = window.prompt("Please provide your password.")
-  if (password != window.prompt("Please confirm your password.")) {
-    window.alert("Emails do not match.")
-    return null;
-  }
-
-  console.log(window.location.href)
-  console.log(email)
-
-  // switch to signInWithEmailAndPassword for login
-  // create... creates.
-
-  firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
-    window.alert("Welcome aboard. An admin must approve you for edit access.")
-  }).catch((error) => {
-    console.log(error)
-  })
-  
+function logOut(event) {
+  firebase.auth().signOut()
+  allowedToEdit = false
 }
 
 /*
@@ -361,9 +330,9 @@ function openPin(event, pinId, pin) {
     document.getElementById("pinPane").dataset.pinId = pinId
   }
 
-  document.getElementById("pinEdit").style.display = ""
+  document.getElementById("pinEdit").style.display = allowedToEdit ? "" : "none"
   document.getElementById("pinSave").style.display = "none"
-  document.getElementById("pinDelete").style.display = ""
+  document.getElementById("pinDelete").style.display = allowedToEdit ? "" : "none"
   document.getElementById("pinCancel").style.display = "none"
   document.getElementById("pinImageUpload").style.display = "none"
 }
