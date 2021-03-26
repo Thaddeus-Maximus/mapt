@@ -77,11 +77,16 @@ textarea {
 }
 
 #mapImage {
-	width: 95%;
+	width: 100000px;
+	height: 100000px;
+	max-width:  95%;
 	max-height: 95vh;
-	object-fit: contain;
 	text-align: center;
 	vertical-align: center;
+}
+
+#mapOverlay {
+	position: absolute;
 }
 
 #pinTitle {

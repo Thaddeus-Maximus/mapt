@@ -14,6 +14,7 @@ window.onload = function() {
   document.getElementById("loginButton").addEventListener("click", (event) => {
     window.location.href = 'login.html';
   })
+  document.getElementById("mapImage").addEventListener("resize", resizeOverlay)
   runFindPins();
 }
 
@@ -78,6 +79,16 @@ function buildSelectList(options, values) {
     }
   }
   return select
+}
+
+function resizeOverlay(event) {
+  const image   = document.getElementById("mapImage")
+  const overlay = document.getElementById("mapOverlay")
+
+  console.log("resizeOverlay", image.clientWidth, image.clientHeight)
+
+  overlay.setAttribute("width",  image.clientWidth)
+  overlay.setAttribute("height", image.clientHeight)
 }
 
 /*
