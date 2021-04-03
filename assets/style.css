@@ -81,12 +81,20 @@ textarea {
 	height: 100000px;
 	max-width:  95%;
 	max-height: 95vh;
-	text-align: center;
-	vertical-align: center;
+	top: 0px;
+	left: 0px;
+	position: relative;
+	z-index: 1;
 }
 
 #mapOverlay {
-	position: absolute;
+	position: relative;
+	top: 0px;
+	left: 0px;
+	z-index: 20;
+	height: 100%;
+	width: 100%;
+	background-size: contain;
 }
 
 #pinTitle {

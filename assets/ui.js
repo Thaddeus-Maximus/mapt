@@ -14,7 +14,7 @@ window.onload = function() {
   document.getElementById("loginButton").addEventListener("click", (event) => {
     window.location.href = 'login.html';
   })
-  document.getElementById("mapImage").addEventListener("resize", resizeOverlay)
+  //document.getElementById("mapImage").addEventListener("resize", resizeOverlay)
   runFindPins();
 }
 
@@ -81,6 +81,11 @@ function buildSelectList(options, values) {
   return select
 }
 
+/*
+ * .naturalWidth and .naturalHeight will give the 'original' size of an image
+ * Couple with .clientWidth and .clientHeight and you can 
+ */
+
 function resizeOverlay(event) {
   const image   = document.getElementById("mapImage")
   const overlay = document.getElementById("mapOverlay")
@@ -145,7 +150,7 @@ function populatePins(pin) {
   }
 
   function loadMapImage(url) {
-    document.getElementById("mapImage").setAttribute("src", url);
+    document.getElementById("mapOverlay").style.background = `url(${url})`;
   }
 
   if (pin.image) {
