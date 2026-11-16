@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block main %}
+{% if homes %}
+<h1>Maps</h1>
+<div class="cards">
+  {% for h in homes %}
+  <a class="card" href="/m/{{ h.id|q }}">
+    <img src="{{ app.image_url(h.map) }}" alt="">
+    <span class="name">{{ h.id }}</span>
+    <span class="muted small">{{ h.things }} thing{{ '' if h.things == 1 else 's' }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="panel narrow welcome">
+  <h1>Nothing mapped yet</h1>
+  <p>Start with a place that has a floor plan: the shop, the building, the house. Upload a picture of
+    its layout (PNG, JPEG or SVG), then click on it to put things where they are.</p>
+  {% if not app.readonly %}<p><a class="btn primary" href="/new?kind=place">+ Add a place</a></p>{% endif %}
+  <p class="muted small">Everything is kept as Markdown files in <code>{{ app.config.places_dir }}/</code> and
+    <code>{{ app.config.things_dir }}/</code>, with images in <code>{{ app.config.attachments_dir }}/</code>.
+    You can open the folder in Obsidian.</p>
+</div>
+{% endif %}
+{% set unmapped = roots|rejectattr('map')|list %}
+{% if unmapped %}
+<h2>Places without a map</h2>
+<p>{% for r in unmapped %}{{ ilink(r.id) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+{% endif %}
+{% endblock %}

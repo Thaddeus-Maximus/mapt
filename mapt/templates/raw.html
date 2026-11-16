@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ path }}{% endblock %}
+{% block main %}
+<form method="post" action="/raw/{{ path|q }}" class="panel">
+  <h1>{{ path }}</h1>
+  <textarea name="text" class="raw notesedit" spellcheck="false">{{ text }}</textarea>
+  <div class="row buttons">
+    <button class="primary">Save</button>
+    <a href="{{ e.id|iurl if e else '/lint' }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

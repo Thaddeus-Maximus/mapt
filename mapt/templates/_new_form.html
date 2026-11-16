@@ -1,0 +1,38 @@
+{# The add form: in the map's side pane (in_pane) or on its own page. #}
+<form method="post" action="/new" enctype="multipart/form-data" class="itemform{{ '' if in_pane else ' panel narrow' }}" data-kind="{{ kind }}" data-place="{{ where.id if where else '' }}">
+  {% if in_pane %}<h2 class="name">Add {% if where %}to {{ where.id }}{% endif %}</h2>
+  {% else %}<h1>Add {% if where %}to {{ where.id }}{% endif %}</h1>{% endif %}
+  <p class="formerror" hidden></p>
+  <div class="kinds">
+    <label><input type="radio" name="kind" value="thing"{{ ' checked' if kind == 'thing' }}> <b>Thing</b> <span class="muted">a tool, a part, a box of screws</span></label>
+    <label><input type="radio" name="kind" value="place"{{ ' checked' if kind == 'place' }}> <b>Place</b> <span class="muted">a room, a shelf, a toolbox: somewhere things are</span></label>
+  </div>
+  <label for="name">Name</label>
+  <input id="name" name="name" required{{ ' autofocus' if not in_pane }} autocomplete="off">
+  <label for="where">Where</label>
+  <input id="where" name="where" list="placenames" value="{{ where.id if where else '' }}" placeholder="the place it's in" autocomplete="off">
+  <datalist id="placenames">{% for p in places %}<option value="{{ p }}">{% endfor %}</datalist>
+  {% if in_pane and on_map %}
+  {% with picked = x and y %}{% include "_spot.html" %}{% endwith %}
+  {% elif x and y %}
+  <input type="hidden" name="x" value="{{ x }}"><input type="hidden" name="y" value="{{ y }}">
+  <p class="muted small hint">At the spot you clicked on the map.</p>
+  {% endif %}
+  <div class="only-thing grid2">
+    <div><label for="qty">How many</label><input id="qty" name="qty" type="number" step="any" min="0" placeholder="blank for tools"></div>
+    <div><label for="unit">Unit</label><input id="unit" name="unit" placeholder="boxes, rolls, ft…"></div>
+    <div><label for="reorder">Reorder at</label><input id="reorder" name="reorder" type="number" step="any" min="0"></div>
+    <div><label for="owner">Owner</label><input id="owner" name="owner"></div>
+  </div>
+  <div class="only-thing"><label for="tags">Tags</label><input id="tags" name="tags" placeholder="tool, power, consumable"></div>
+  <div class="only-place"><label for="mapfile">Map <span class="muted">(optional)</span></label><input id="mapfile" name="mapfile" type="file" accept="image/*,.svg">
+    <p class="muted small hint">A floor plan or photo to put pins on. Without one, it shows as a single pin on the map it's in.</p></div>
+  <label for="body">Notes</label>
+  <textarea id="body" name="body" rows="6" class="notesedit" placeholder="Anything worth knowing. Paste or drop photos here."></textarea>
+  <div class="row buttons">
+    <button class="primary">Save</button>
+    {% if in_pane %}<button type="button" class="btn" data-act="cancel">Cancel</button>
+    {% else %}<a href="javascript:history.back()">Cancel</a>{% endif %}
+    <label class="btn upload">Add photo<input type="file" accept="image/*" data-for="body" hidden></label>
+  </div>
+</form>

@@ -1,0 +1,47 @@
+{# The edit form: in the map's side pane (in_pane) or on its own page. #}
+<form method="post" action="/edit/{{ e.id|q }}" enctype="multipart/form-data" class="itemform{{ '' if in_pane else ' panel narrow' }}" data-kind="{{ 'thing' if e.kind == 'thing' else 'place' }}" data-id="{{ e.id }}">
+  {% if in_pane %}<h2 class="name">Edit {{ e.id }}</h2>{% else %}<h1>Edit {{ e.id }}</h1>{% endif %}
+  <p class="formerror" hidden></p>
+  <label for="name">Name</label>
+  <input id="name" name="name" value="{{ e.id }}" required autocomplete="off">
+  <p class="muted small hint">Renaming updates every link to it.</p>
+  <label for="where">{{ 'Where' if e.kind == 'thing' else 'Inside' }}</label>
+  <input id="where" name="where" list="placenames" value="{{ e.parent or '' }}" autocomplete="off">
+  <datalist id="placenames">{% for p in places %}{% if p != e.id %}<option value="{{ p }}">{% endif %}{% endfor %}</datalist>
+  {% if in_pane and on_map %}
+  {% with x = (e.x|string if e.x is not none and e.parent == on_map else ''), y = (e.y|string if e.y is not none and e.parent == on_map else ''), picked = false %}{% include "_spot.html" %}{% endwith %}
+  {% elif e.x is not none %}<p class="muted small hint">Moving it somewhere else takes its pin off this map; put it on the new map from there.</p>{% endif %}
+  {% if e.kind == 'thing' %}
+  <div class="grid2">
+    <div><label for="qty">How many</label><input id="qty" name="qty" type="number" step="any" min="0" value="{{ e.qty|num }}"></div>
+    <div><label for="unit">Unit</label><input id="unit" name="unit" value="{{ e.unit or '' }}"></div>
+    <div><label for="reorder">Reorder at</label><input id="reorder" name="reorder" type="number" step="any" min="0" value="{{ e.reorder|num }}"></div>
+    <div><label for="owner">Owner</label><input id="owner" name="owner" value="{{ f.owner or '' }}"></div>
+  </div>
+  <label for="tags">Tags</label><input id="tags" name="tags" value="{{ tags }}">
+  {% else %}
+  <label for="mapfile">Map <span class="muted">(optional)</span></label>
+  {% if e.map %}
+  <p class="small">Now: <a href="/img?name={{ e.map|q }}" target="_blank">{{ e.map.rsplit('/', 1)[-1] }}</a></p>
+  <label class="row check"><input type="checkbox" name="remove_map" value="1"> Remove the map (it shows as one pin on the map it's in)</label>
+  {% endif %}
+  <input id="mapfile" name="mapfile" type="file" accept="image/*,.svg">
+  {% if e.map %}<p class="muted small hint">A new image keeps the pins where they are, as a share of its width and height.</p>{% endif %}
+  {% endif %}
+  {% if extra %}
+  <p class="small muted">Other fields: {% for k, v in extra.items() %}<code>{{ k }}</code>{% if not loop.last %}, {% endif %}{% endfor %} (edit them in the whole file)</p>
+  {% endif %}
+  <label for="body">Notes</label>
+  <textarea id="body" name="body" rows="{{ 8 if in_pane else 12 }}" class="notesedit">{{ e.body or '' }}</textarea>
+  <div class="row buttons">
+    <button class="primary">Save</button>
+    {% if in_pane %}<button type="button" class="btn" data-act="cancel" data-id="{{ e.id }}">Cancel</button>
+    {% else %}<a href="{{ e.id|iurl }}">Cancel</a>{% endif %}
+    <label class="btn upload">Add photo<input type="file" accept="image/*" data-for="body" hidden></label>
+  </div>
+  <p class="small"><a href="/raw/{{ e.path|q }}">Edit the whole file</a></p>
+</form>
+<form method="post" action="/delete/{{ e.id|q }}" class="{{ '' if in_pane else 'narrow ' }}deleteform"
+      data-confirm="Delete {{ e.id }}?{% if e.children %} The {{ e.children }} item{{ '' if e.children == 1 else 's' }} inside will be left without a place.{% endif %} (The file goes to .trash/.)">
+  <button class="danger">Delete {{ e.id }}</button>
+</form>

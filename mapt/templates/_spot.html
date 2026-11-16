@@ -1,0 +1,10 @@
+{# Where it sits on the map the pane belongs to. Shown (and sent) only while "Where" names that map. #}
+<div class="spot" data-map="{{ on_map }}"{{ ' data-picked' if picked }}>
+  <input type="hidden" name="x" value="{{ x }}"><input type="hidden" name="y" value="{{ y }}">
+  <label>Spot on {{ on_map }}</label>
+  <div class="row">
+    <span class="spottext small muted">{{ 'Marked on the map.' if x else 'Not on the map.' }}</span>
+    <button type="button" class="btn tiny" data-act="pick">{{ 'Change' if x else 'Pick on map' }}</button>
+    <button type="button" class="btn tiny" data-act="unpick"{{ ' hidden' if not x }}>Clear</button>
+  </div>
+</div>

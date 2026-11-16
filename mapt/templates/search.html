@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ q or 'Search' }}{% endblock %}
+{% block main %}
+<h1>{% if q %}“{{ q }}”{% else %}Search{% endif %}</h1>
+{% if q %}
+{% if rows %}
+<ul class="results">
+  {% for r in rows %}
+  <li>
+    {{ ilink(r.id) }}
+    {% if r.qty is not none %}<span class="muted{{ ' lowtext' if r.low }}">×{{ r.qty|num }}{% if r.unit %} {{ r.unit }}{% endif %}</span>{% endif %}
+    <div class="where small">{% for a in r|chain %}{{ ilink(a) }}{% if not loop.last %} › {% endif %}{% else %}<span class="muted">not in any place</span>{% endfor %}</div>
+    {% if r.snippet %}<div class="snippet small muted">{{ app.snippet(r.snippet) }}</div>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">Nothing matches.{% if not app.readonly %} <a href="/new?kind=thing">Add it?</a>{% endif %}</p>
+{% endif %}
+{% endif %}
+{% endblock %}

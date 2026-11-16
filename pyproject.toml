@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mapt"
+version = "0.1.0"
+description = "Where everything is: places, things and inventory on floor plans, kept as Markdown files"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+  "ruamel.yaml>=0.18",
+  "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+mapt = "mapt.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mapt*"]
+
+[tool.setuptools.package-data]
+mapt = ["templates/*", "static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
