@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Things' if kind == 'thing' else 'Places' }}{% endblock %}
+{% block main %}
+<div class="titlebar">
+  <h1>{{ 'Things' if kind == 'thing' else 'Places' }}{% if tag %} <a class="tag" href="/things">#{{ tag }} ✕</a>{% endif %}</h1>
+  <span class="muted">{{ rows|length }}</span>
+  <input type="search" class="tablefilter" data-for="list" placeholder="Filter…" autocomplete="off">
+  {% if not app.readonly %}<a class="btn right" href="/new?kind={{ 'thing' if kind == 'thing' else 'place' }}">+ Add</a>{% endif %}
+</div>
+<div class="tablewrap">
+<table id="list" class="sortable">
+  <thead><tr>
+    <th>Name</th><th>{{ 'Where' if kind == 'thing' else 'Inside' }}</th>
+    {% if kind == 'thing' %}<th class="num">Qty</th><th>Owner</th><th>Tags</th><th>Added</th>
+    {% else %}<th>Map</th><th class="num">Things</th>{% endif %}
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr>
+    <td>{{ ilink(r.id) }}</td>
+    <td class="small">{% for a in r|chain %}{{ ilink(a) }}{% if not loop.last %} › {% endif %}{% else %}<span class="muted">—</span>{% endfor %}{% if r.x is none and r.parent and r.map_place and r.pin == r.id %} <span class="badge" title="not placed on the map yet">unplaced</span>{% endif %}</td>
+    {% if kind == 'thing' %}
+    <td class="num{{ ' lowtext' if r.low }}">{% if r.qty is not none %}{{ r.qty|num }}{% if r.unit %} {{ r.unit }}{% endif %}{% endif %}</td>
+    <td>{{ r.owner or '' }}</td>
+    <td>{% for t in r|tags %}<a class="tag" href="/things?tag={{ t|q }}">#{{ t }}</a> {% endfor %}</td>
+    <td class="small" data-sort="{{ r.added or '' }}">{{ r.added|day }}</td>
+    {% else %}
+    <td>{% if r.map %}<a href="/m/{{ r.id|q }}">open</a>{% endif %}</td>
+    <td class="num">{{ r.things }}</td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if not rows %}<p class="muted">None yet.</p>{% endif %}
+{% endblock %}

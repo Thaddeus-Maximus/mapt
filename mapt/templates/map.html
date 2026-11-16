@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ place.id }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ static('vendor/leaflet/leaflet.css') }}">{% endblock %}
+{% block body_attrs %} class="fill mappage"{% endblock %}
+{% block main %}
+<div class="mapview">
+  <section class="mapcol">
+    <div class="mapbar">
+      <nav class="crumbs">{% for a in place|chain %}{{ ilink(a) }}<span class="sep">›</span>{% endfor %}<b>{{ place.id }}</b></nav>
+      <input type="search" id="filter" placeholder="Filter this map…" autocomplete="off">
+      {% if not app.readonly %}<button type="button" class="btn" id="addbtn" title="Click the map where the new thing is (A)">+ Add</button>{% endif %}
+    </div>
+    <div class="mapwrap">
+      <div id="map" class="map"></div>
+      <div class="maphint" id="hint" hidden></div>
+    </div>
+  </section>
+  <aside class="pane" id="pane">{{ pane }}</aside>
+</div>
+<button type="button" class="peek" id="peek"><span class="label"></span><span class="go">Details ▸</span></button>
+{% endblock %}
+{% block scripts %}
+<script src="{{ static('vendor/leaflet/leaflet.js') }}"></script>
+<script>mapt.placeMap(document.getElementById("map"), {{ data|tojson }});</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Problems{% endblock %}
+{% block main %}
+<div class="titlebar">
+  <h1>Problems</h1>
+  <a href="/lint{{ '' if all else '?all=1' }}">{{ 'hide notes' if all else 'show notes too' }}</a>
+</div>
+{% if rows %}
+<table class="lint">
+  {% for w in rows %}
+  <tr>
+    <td>{% if app.readonly %}{{ w.path }}{% else %}<a href="/raw/{{ w.path|q }}">{{ w.path }}</a>{% endif %}</td>
+    <td class="code sev-{{ w.severity }}">{{ w.code }}</td>
+    <td>{{ w.message }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No problems.</p>{% endif %}
+{% endblock %}

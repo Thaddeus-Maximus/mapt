@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Stock{% endblock %}
+{% block main %}
+<div class="titlebar">
+  <h1>Stock</h1>
+  <span class="muted">things with an amount on hand; low ones first</span>
+  <input type="search" class="tablefilter" data-for="stock" placeholder="Filter…" autocomplete="off">
+</div>
+<div class="tablewrap">
+<table id="stock" class="sortable">
+  <thead><tr><th>Name</th><th>Where</th><th class="num">On hand</th><th class="num">Reorder at</th>
+    <th>Uses</th><th>Runs out in</th><th>Last bought</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr class="{{ 'low' if r.low }}">
+    <td>{{ ilink(r.id) }}</td>
+    <td class="small">{% for a in r|chain %}{{ ilink(a) }}{% if not loop.last %} › {% endif %}{% endfor %}</td>
+    <td class="num" data-sort="{{ r.qty if r.qty is not none else '' }}">{{ r.qty|num }}{% if r.unit %} {{ r.unit }}{% endif %}</td>
+    <td class="num">{{ r.reorder|num }}</td>
+    <td class="small" data-sort="{{ r.per_day or 0 }}">{{ r.per_day|rate(r.unit) }}</td>
+    <td class="small" data-sort="{{ r.days_left if r.days_left is not none else 99999 }}">{{ r.days_left|left }}</td>
+    <td class="small" data-sort="{{ r.last_bought or '' }}">{{ r.last_bought|day }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if not rows %}
+<p class="muted">Nothing is counted yet. Give a thing a <b>How many</b> when you add or edit it, then use the
+  Used / Bought buttons on it; mapt keeps the history in its notes and works out how fast it goes.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% set here = on_map and e.parent and e.parent == on_map %}
+<div class="pane-item" data-id="{{ e.id }}" data-pin="{{ (e.id if is_map else e.pin) or '' }}" data-kind="{{ e.kind }}">
+  {% if on_map %}<button type="button" class="phone-only btn back" data-act="showmap">◂ Map</button>{% endif %}
+  {% if chain %}<nav class="crumbs">{% for a in chain %}{{ ilink(a) }}<span class="sep">›</span>{% endfor %}</nav>{% endif %}
+  <h2 class="name">{{ e.id }}</h2>
+  <div class="meta">
+    {% if e.kind == 'thing' %}<span class="badge thing">Thing</span>
+    {% else %}<span class="badge place">Place{{ ' · map' if e.map }}</span>{% endif %}
+    {% if e.qty is not none %}<span class="badge qty{{ ' low' if e.low }}">{{ e.qty|num }}{% if e.unit %} {{ e.unit }}{% endif %} on hand</span>{% endif %}
+    {% for t in tags %}<a class="tag" href="/things?tag={{ t|q }}">#{{ t }}</a>{% endfor %}
+  </div>
+
+  <div class="actions">
+    {% if e.map and not is_map %}<a class="btn primary" href="/m/{{ e.id|q }}">Open map ▸</a>
+    {% elif on_map and e.map_place and e.map_place != on_map %}<a class="btn primary" href="{{ e.id|iurl }}">Show on {{ e.map_place }} ▸</a>{% endif %}
+    {% if not app.readonly %}
+      <a class="btn" href="/edit/{{ e.id|q }}" data-form="/form/edit/{{ e.id|q }}">Edit</a>
+      {% if here and e.x is not none %}<button type="button" class="btn" data-act="move" data-id="{{ e.id }}">Move pin</button>{% endif %}
+      {% if here and e.x is none %}<button type="button" class="btn" data-act="place" data-id="{{ e.id }}">Put on map</button>{% endif %}
+      {% if e.kind == 'place' %}<a class="btn" href="/new?place={{ e.id|q }}" data-form="/form/new?place={{ e.id|q }}">+ Add inside</a>{% endif %}
+    {% endif %}
+  </div>
+  {% if not is_map and on_map and e.map_place == on_map and e.pin and e.pin != e.id %}
+  <p class="muted small inside">On the map: {{ ilink(e.pin) }}</p>
+  {% elif on_map and e.parent and not e.map_place and not e.map %}
+  <p class="muted small inside">Not on any map: {{ ilink(e.parent) }} has no map above it.</p>
+  {% endif %}
+  {% if not e.parent and e.kind == 'thing' %}
+  <p class="warn small">Not in any place yet. Edit it to say where it is.</p>
+  {% endif %}
+
+  {% if photo %}<a href="{{ app.image_url(photo) }}" target="_blank"><img class="photo" src="{{ app.image_url(photo) }}" alt=""></a>{% endif %}
+
+  {% set x = extra(e) %}
+  {% if e.owner or e.added or x %}
+  <dl class="props">
+    {% if e.owner %}<dt>Owner</dt><dd>{{ e.owner|inline }}</dd>{% endif %}
+    {% if e.added %}<dt>Added</dt><dd>{{ e.added|day }}</dd>{% endif %}
+    {% for k, v in x.items() %}<dt>{{ k }}</dt><dd>{% if v is string %}{{ v|inline }}{% elif v is iterable and v is not mapping %}{{ v|join(", ") }}{% else %}{{ v }}{% endif %}</dd>{% endfor %}
+  </dl>
+  {% endif %}
+
+  {% if notes %}<div class="notes">{{ notes }}</div>{% endif %}
+
+  {% if st is not none %}
+  <section class="stock">
+    <h3>Stock</h3>
+    <p>
+      <b class="onhand{{ ' low' if e.low }}">{{ e.qty|num if e.qty is not none else '?' }}{% if e.unit %} {{ e.unit }}{% endif %}</b> on hand
+      {% if e.reorder is not none %}<span class="muted">· reorder at {{ e.reorder|num }}</span>{% endif %}
+      {% if e.low %}<span class="badge qty low">time to buy more</span>{% endif %}
+    </p>
+    {% if st.per_day or st.last_bought %}
+    <p class="small">
+      {% if st.per_day %}Uses about <b>{{ st.per_day|rate(e.unit) }}</b>{% if st.days_left is not none %}; runs out in about <b>{{ st.days_left|left }}</b>{% endif %}.{% endif %}
+      {% if st.last_bought %} Last bought {{ st.last_bought|day }}.{% endif %}
+    </p>
+    {% endif %}
+    {% if not app.readonly %}
+    <form method="post" action="/stock/{{ e.id|q }}" class="row stockform">
+      <input type="number" name="n" value="1" min="0" step="any" inputmode="decimal" aria-label="how many">
+      <button name="kind" value="use">Used</button>
+      <button name="kind" value="buy">Bought</button>
+      <button name="kind" value="count" title="Set the amount on hand to this">Counted</button>
+    </form>
+    {% endif %}
+    {% if st.history %}
+    <table class="history small">
+      {% for ev, after in st.history %}
+      <tr><td>{{ ev.ts|day }}</td><td>{{ {'buy': 'bought', 'use': 'used', 'count': 'counted'}[ev.kind] }} {{ ev.n|num }}</td><td class="muted">{% if after is not none %}→ {{ after|num }}{% endif %}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if unplaced %}
+  <section>
+    <h3>Not on the map yet</h3>
+    <ul class="contents">
+      {% for c in unplaced %}
+      <li>{{ ilink(c.id) }}{% if c.qty is not none %} <span class="muted">×{{ c.qty|num }}</span>{% endif %}
+        {% if not app.readonly %}<button type="button" class="btn tiny" data-act="place" data-id="{{ c.id }}">Put on map</button>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% set skip = unplaced|map(attribute='id')|list %}
+  {% set shown = children|rejectattr('id', 'in', skip)|list %}
+  {% if shown %}
+  <section>
+    <h3>{{ 'On this map' if is_map else 'Inside' }} <span class="muted small">{{ shown|length }}</span></h3>
+    <ul class="contents">
+      {% for c in shown %}
+      <li>{{ ilink(c.id) }}{% if c.qty is not none %} <span class="muted{{ ' lowtext' if c.low }}">×{{ c.qty|num }}{% if c.unit %} {{ c.unit }}{% endif %}</span>{% endif %}
+        {% if c.kind == 'place' and c.things %}<span class="muted small">· {{ c.things }} thing{{ '' if c.things == 1 else 's' }}</span>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  <p class="muted small src">{{ e.path }}</p>
+</div>
